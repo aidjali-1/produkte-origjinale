@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="sq">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PRODUKTE PA LIMIT</title>
+  <meta name="description" content="Dyqan online" />
+
+  <!-- Tipografi bazë (pa Google Fonts për thjeshtësi) -->
+  <style>
+    :root {
+      --bg: #ffffff;
+      --fg: #0a0a0a;
+      --muted: #6b7280; /* gri */
+      --card: #ffffff;
+      --border: #e5e7eb;
+      --accent: #111827; /* e zezë e butë */
+      --accent-2: #000000;
+      --radius: 16px;
+      --shadow: 0 6px 24px rgba(0,0,0,.06);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu, Cantarell, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg); color: var(--fg);
+    }
+    a { color: inherit; text-decoration: none; }
+
+    /* Header */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(1.2) blur(6px);
+      background: rgba(255,255,255,.7);
+      border-bottom: 1px solid var(--border);
+    }
+    .container { max-width: 1100px; margin: 0 auto; padding: 16px; }
+    .row { display: flex; align-items: center; gap: 12px; }
+    .space-between { justify-content: space-between; }
+
+    .brand { font-weight: 800; letter-spacing: .5px; font-size: 22px; }
+    .search {
+      flex: 1; display: flex; align-items: center; gap: 8px;
+      background: #f8fafc; border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px;
+    }
+    .search input {
+      flex: 1; border: none; outline: none; background: transparent; font-size: 14px;
+    }
+
+    .pill {
+      border: 1px solid var(--border); padding: 8px 12px; border-radius: 999px; font-size: 14px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 28px 16px 10px; border-bottom: 1px solid var(--border);
+    }
+    .hero h1 { font-size: 28px; margin: 0 0 8px; }
+    .hero p { margin: 0; color: var(--muted); }
+
+    /* Grid e produkteve */
+    .grid {
+      padding: 18px 16px 64px;
+      display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 16px; max-width: 1100px; margin: 0 auto;
+    }
+    @media (min-width: 640px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+
+    .card {
+      background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow);
+      display: flex; flex-direction: column;
+    }
+    .thumb { aspect-ratio: 4 / 5; width: 100%; object-fit: cover; background: #f3f4f6; }
+    .card-body { padding: 12px 14px; display: grid; gap: 6px; }
+    .title { font-weight: 600; }
+    .price { font-weight: 700; }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      border-radius: 12px; padding: 10px 14px; border: 1px solid var(--accent);
+      background: #fff; color: var(--accent);
+      transition: transform .06s ease, background .2s ease; cursor: pointer; font-weight: 600;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn.primary { background: var(--accent); color: #fff; }
+    .btn.full { width: 100%; }
+
+    /* Modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 100;
+    }
+    .modal { width: 100%; max-width: 950px; background: #fff; border-radius: 18px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); display: grid; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .modal { grid-template-columns: 1.1fr .9fr; } }
+    .modal-left { background: #f8fafc; padding: 14px; display: grid; gap: 10px; }
+    .modal-right { padding: 18px; display: grid; gap: 12px; }
+    .modal h2 { margin: 0; }
+    .close-x { position: absolute; top: 12px; right: 12px; background: #fff; border: 1px solid var(--border); border-radius: 999px; height: 36px; width: 36px; display: grid; place-items: center; cursor: pointer; }
+    .thumbs-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+    .thumbs-row img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 10px; border: 2px solid transparent; cursor: pointer; }
+    .thumbs-row img.active { border-color: var(--accent); }
+
+    .qty-row, .option-row { display: flex; gap: 8px; align-items: center; }
+    .qty-input { width: 64px; padding: 8px; border-radius: 10px; border: 1px solid var(--border); text-align: center; }
+    select { border: 1px solid var(--border); border-radius: 10px; padding: 8px 10px; background: #fff; }
+    textarea, input[type="text"], input[type="tel"], input[type="number"] {
+      width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 10px 12px;
+    }
+    form .two-col { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    @media (min-width: 640px) { form .two-col { grid-template-columns: 1fr 1fr; } }
+
+    .footer { border-top: 1px solid var(--border); padding: 18px 16px; color: var(--muted); text-align: center; }
+    .notice { font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container row space-between">
+      <div class="row" style="gap:14px">
+        <div class="brand">PRODUKTE PA LIMIT</div>
+        <nav class="row" style="gap:8px">
+          <a class="pill" href="#" id="filter-all">Të gjitha</a>
+          <a class="pill" href="#" data-cat="Rroba">Rroba</a>
+          <a class="pill" href="#" data-cat="Aksesore">Aksesore</a>
+        </nav>
+      </div>
+      <div class="search">
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 104.5 4.5a7.5 7.5 0 0012.15 12.15z"/></svg>
+        <input id="search" type="text" placeholder="Kërko produkt..." />
+      </div>
+    </div>
+  </header>
+
+  <section class="hero container">
+    <h1>Produkte të reja çdo javë</h1>
+    <p>Porosit tani, paguan te posta.</p>
+  </section>
+
+  <!-- GRID E PRODUKTEVE -->
+  <main class="grid" id="grid"></main>
+
+  <footer class="footer">
+    © <span id="year"></span> PRODUKTE PA LIMIT — Dërgesa me postë. Pagim në dorëzim.
+    <div class="notice">* Porositë kryhen përmes WhatsApp. Asnjë pagesë online nuk kërkohet.</div>
+  </footer>
+
+  <!-- MODAL PRODUKTI -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal" role="dialog" aria-modal="true">
+      <button class="close-x" id="closeModal" aria-label="Mbyll">✕</button>
+      <div class="modal-left">
+        <img id="modalMainImg" src="" alt="Foto produkti" style="width:100%; border-radius: 12px; aspect-ratio: 4/5; object-fit: cover; background:#fff" />
+        <div class="thumbs-row" id="thumbsRow"></div>
+      </div>
+      <div class="modal-right">
+        <div class="muted" id="modalCategory"></div>
+        <h2 id="modalTitle"></h2>
+        <div class="price" id="modalPrice"></div>
+        <p class="muted" id="modalDesc"></p>
+
+        <div class="option-row">
+          <label for="optionSize">Masa:</label>
+          <select id="optionSize"></select>
+        </div>
+        <div class="option-row">
+          <label for="optionColor">Ngjyra:</label>
+          <select id="optionColor"></select>
+        </div>
+        <div class="qty-row">
+          <label for="qty">Sasia:</label>
+          <input class="qty-input" id="qty" type="number" min="1" value="1" />
+        </div>
+
+        <div class="row" style="gap:10px; flex-wrap: wrap;">
+          <button class="btn primary" id="orderBtn">Bëj Porosi</button>
+          <button class="btn" id="waBtn"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL POROSIE -->
+  <div class="modal-backdrop" id="orderModal">
+    <div class="modal" role="dialog" aria-modal="true" style="max-width:720px; grid-template-columns: 1fr;">
+      <button class="close-x" id="closeOrderModal" aria-label="Mbyll">✕</button>
+      <div class="modal-right">
+        <h2>Formular Porosie</h2>
+        <form id="orderForm">
+          <div class="two-col">
+            <div>
+              <label>Emri dhe Mbiemri</label>
+              <input type="text" name="full_name" placeholder="p.sh. Ardi Hysa" required />
+            </div>
+            <div>
+              <label>Numri i telefonit</label>
+              <input type="tel" name="phone" placeholder="p.sh. 06x xx xx xxx" required />
+            </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <label>Qyteti</label>
+              <input type="text" name="city" placeholder="p.sh. Tiranë" required />
+            </div>
+            <div>
+              <label>Adresa</label>
+              <input type="text" name="address" placeholder="Rruga, pallati, shkalla, kati" required />
+            </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <label>Produkt</label>
+              <input type="text" name="product" readonly />
+            </div>
+            <div>
+              <label>Detaje</label>
+              <input type="text" name="variant" readonly />
+            </div>
+          </div>
+          <div class="two-col">
+            <div>
+              <label>Sasia</label>
+              <input type="number" name="quantity" min="1" value="1" required />
+            </div>
+            <div>
+              <label>Shënime (opsionale)</label>
+              <input type="text" name="note" placeholder="" />
+            </div>
+          </div>
+
+          <div class="row" style="gap:10px; margin-top:6px; flex-wrap:wrap;">
+            <button class="btn" type="button" id="orderWhatsApp">WhatsApp</button>
+          </div>
+          <div class="notice">Pas dërgimit, do të marrësh konfirmim nga ne përmes telefonit / WhatsApp.</div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // =============================
+    // 1) KONFIGURIM BAZË
+    // =============================
+    const WHATSAPP_NUMBER = "355683848110"; // vendos numrin tënd pa +, p.sh. 35569xxxxxxx
+    
+    // =============================
+    // 2) TE DHENAT E PRODUKTEVE (mund t'i ndryshosh lirisht)
+    // =============================
+    const PRODUCTS = [
+      {
+        id: "kreher-classic",
+        title: "Krehër Profesional",
+        category: "Aksesore",
+        price: 150,
+        currency: "ALL",
+        description: "Kreher plastik profesional.",
+        images: [
+          "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/8cde45142a5d9f90cfb2bc1d93e39f97.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/Fancyalgo/VirtualModelMatting/c837b93b9a911f9cd172c42fb2c68d8b.jpg?imageView2/2/w/800/q/70/format/webp",
+        ],
+        sizes: ["SKA"],
+        colors: ["Zi", "Roze", "Lejla", "Blu"],
+      },
+      {
+        id: "fustan-midi",
+        title: "Xhinse",
+        category: "Rroba",
+        price: 2400,
+        currency: "ALL",
+        description: "Xhinse artificiale të zeza klasike për meshkuj - Përshtatje e rregullt për të gjitha stinët me model gjeometrik dhe detaje të grisura, xhinse artificiale të qëndrueshme për veshje të përditshme, modë e rehatshme, teksturë e larë, ndërtim i fortë, stil rruge, modë urbane, qepje cilësore, dashamirës të veshjeve të rrugës",
+        images: [
+          "https://img.kwcdn.com/product/fancy/c940105f-d4cb-4aa4-90e6-4bb4e4bb15d8.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/a2c8f7df-cc89-4afe-a386-a5a45ffb9b85.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/19df88f4-c823-4c55-b08d-b4e700750c01.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/1f2a27ae-8c32-4e6e-8591-f718e3ecf2ca.jpg?imageView2/2/w/800/q/70/format/webp"
+        ],
+        sizes: ["XS","S","M","L","XL"],
+        colors: ["E zezë blozë"],
+      },
+      {
+        id: "bluze-basic",
+        title: "Tuta",
+        category: "Rroba",
+        price: 1200,
+        currency: "ALL",
+        description: "Pantallona të shkurtra Vintage me printim Hip-Hop, me lidhëse, me stil Y2K - Blu me dizajn abstrakt të bardhë, të lirshme për burra dhe gra, perfekte për pranverë/verë/vjeshtë",
+        images: [
+          "https://img.kwcdn.com/product/fancy/3a08ef30-eb84-4337-9a11-92e36defdced.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/ccf50119-15da-429a-ab71-b4fbd737d58e.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/f0b6da6a-9ece-43c4-b893-9d175772bc00.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/34f89e4d-96af-4a48-9838-5b0053f89e4b.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/344140c2-0fd2-4fb0-9394-d18b42b1a354.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/bcacab9b-61dc-40dd-b6f3-727267d3be64.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/c4a362e1-6cc8-40e0-9578-1d835a12d911.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/a3b02118-7fb1-4e8b-b659-92b8e6964ebc.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/d0081fc3-7f4d-4776-b982-e5b7014197cf.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/3396ca4e-8769-47bb-8dde-162e95fcc7e7.jpg?imageView2/2/w/800/q/70/format/webp"
+        ],
+        sizes: ["S","M","L","XL"],
+        colors: ["E bardhë", "E zezë", "Gri", "E kuqe", "Gri e gjelber"],
+        },
+        {
+        id: "ore-dixhitale",
+        title: "Ore Dixhitale",
+        category: "Aksesore",
+        price: 900,
+        currency: "ALL",
+        description: "Orë Dixhitale Multifunksionale me Alarm me Ndriçim të Rregullueshëm, Shfaqje Date dhe Energji USB - Dizajn Elegant Drejtkëndor, i Përshtatshëm për Dekor Shtëpie, Dhuratë Festash",
+        images: [
+          "https://img.kwcdn.com/product/fancy/cf7c540d-fa63-4295-bfc0-60b0f8a360b5.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/e5cc1bfc-2579-4247-ba8b-d357e2b39e04.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/88b07d5f-69ff-4eaf-addb-9b62b01617d0.jpg?imageView2/2/w/800/q/70/format/webp"
+        ],
+        sizes: ["SKA"],
+        colors: ["Blu", "Jeshile", "Lejla"],
+        },
+        {
+        id: "kapele",
+        title: "Kapele Plazhi",
+        category: "Rroba",
+        price: 350,
+        currency: "ALL",
+        description: "Kapelë kove unisex me printim të pemës së kokosit - Stil bohem tropikal pushimesh, e ajrosur dhe e qëndrueshme për në plazh, veshje të rastësishme, për burra dhe gra, mbulesë koke e lehtë, aksesor veror, elegant boho, përshtatje e rehatshme, modë boho",
+        images: [
+          "https://img.kwcdn.com/product/fancy/fbf56974-01bf-4429-91f8-0c6321fab5cc.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/7751b6f3-dc27-40ac-af58-b6b297a39310.jpg?imageView2/2/w/800/q/70/format/webp",
+          "https://img.kwcdn.com/product/fancy/d9cdf9da-eebe-4e23-b82a-2c666bf94b88.jpg?imageView2/2/w/800/q/70/format/webp"
+        ],
+        sizes: ["SKA"],
+        colors: ["E bardhe", "E zeze", "E zeze me jeshile"],
+        }
+      
+    ];
+
+    // =============================
+    // 3) RENDER I PRODUKTEVE
+    // =============================
+    const grid = document.getElementById('grid');
+    const searchInput = document.getElementById('search');
+
+    const state = { filter: null, query: '' };
+
+    function formatPrice(p) { return new Intl.NumberFormat('sq-AL').format(p) + ' ALL'; }
+
+    function renderProducts() {
+      const q = state.query.toLowerCase();
+      const filtered = PRODUCTS.filter(p => {
+        const byCat = state.filter ? p.category === state.filter : true;
+        const byQuery = q ? (p.title.toLowerCase().includes(q) || p.description.toLowerCase().includes(q)) : true;
+        return byCat && byQuery;
+      });
+
+      grid.innerHTML = filtered.map(p => `
+        <article class="card" data-id="${p.id}">
+          <img class="thumb" src="${p.images[0]}" alt="${p.title}" loading="lazy" />
+          <div class="card-body">
+            <div class="title">${p.title}</div>
+            <div class="muted">${p.category}</div>
+            <div class="row" style="justify-content: space-between; align-items: center;">
+              <div class="price">${formatPrice(p.price)}</div>
+              <button class="btn" data-open="${p.id}">Shiko</button>
+            </div>
+          </div>
+        </article>
+      `).join('');
+
+      // Click listeners pas renderit
+      document.querySelectorAll('[data-open]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const id = e.currentTarget.getAttribute('data-open');
+          const product = PRODUCTS.find(x => x.id === id);
+          openProductModal(product);
+        });
+      });
+    }
+
+    // Fillestar
+    renderProducts();
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Kërkim
+    searchInput.addEventListener('input', (e) => { state.query = e.target.value; renderProducts(); });
+
+    // Filtrim nga nav
+    document.querySelectorAll('nav [data-cat]').forEach(a => {
+      a.addEventListener('click', (e) => { e.preventDefault(); state.filter = a.getAttribute('data-cat'); renderProducts(); });
+    });
+    document.getElementById('filter-all').addEventListener('click', (e) => { e.preventDefault(); state.filter = null; renderProducts(); });
+
+    // =============================
+    // 4) MODAL I PRODUKTIT
+    // =============================
+    const productModal = document.getElementById('productModal');
+    const closeModalBtn = document.getElementById('closeModal');
+
+    const modalTitle = document.getElementById('modalTitle');
+    const modalPrice = document.getElementById('modalPrice');
+    const modalDesc = document.getElementById('modalDesc');
+    const modalCat = document.getElementById('modalCategory');
+    const modalMainImg = document.getElementById('modalMainImg');
+    const thumbsRow = document.getElementById('thumbsRow');
+    const sizeSel = document.getElementById('optionSize');
+    const colorSel = document.getElementById('optionColor');
+    const qtyInput = document.getElementById('qty');
+    const orderBtn = document.getElementById('orderBtn');
+    const waBtn = document.getElementById('waBtn');
+
+    let currentProduct = null;
+
+    function openProductModal(p) {
+      currentProduct = p;
+      modalTitle.textContent = p.title;
+      modalPrice.textContent = formatPrice(p.price);
+      modalDesc.textContent = p.description;
+      modalCat.textContent = p.category;
+
+      sizeSel.innerHTML = p.sizes.map(s => `<option value="${s}">${s}</option>`).join('');
+      colorSel.innerHTML = p.colors.map(c => `<option value="${c}">${c}</option>`).join('');
+      qtyInput.value = 1;
+
+      modalMainImg.src = p.images[0];
+      thumbsRow.innerHTML = p.images.map((src, i) => `<img ${i===0?'class="active"':''} data-src="${src}" src="${src}" alt="foto" />`).join('');
+      thumbsRow.querySelectorAll('img').forEach(img => {
+        img.addEventListener('click', () => {
+          thumbsRow.querySelectorAll('img').forEach(x => x.classList.remove('active'));
+          img.classList.add('active');
+          modalMainImg.src = img.getAttribute('data-src');
+        });
+      });
+
+      productModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeProductModal() {
+      productModal.style.display = 'none';
+      document.body.style.overflow = '';
+      currentProduct = null;
+    }
+
+    closeModalBtn.addEventListener('click', closeProductModal);
+    productModal.addEventListener('click', (e) => { if (e.target === productModal) closeProductModal(); });
+
+    // WhatsApp nga modal produkti
+    waBtn.addEventListener('click', () => {
+      if (!currentProduct) return;
+      const text = `Përshëndetje! Dua të bëj porosi:\n- Produkt: ${currentProduct.title}\n- Masa: ${sizeSel.value}\n- Ngjyra: ${colorSel.value}\n- Sasia: ${qtyInput.value}`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    });
+
+    // Hap formularin e porosisë me të dhënat e produktit
+    const orderModal = document.getElementById('orderModal');
+    const closeOrderModalBtn = document.getElementById('closeOrderModal');
+    const orderForm = document.getElementById('orderForm');
+    const orderWA = document.getElementById('orderWhatsApp');
+
+    orderBtn.addEventListener('click', () => {
+      if (!currentProduct) return;
+      orderModal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+      // mbush fushat e lexueshme
+      orderForm.product.value = currentProduct.title;
+      orderForm.variant.value = `Masa: ${sizeSel.value} | Ngjyra: ${colorSel.value}`;
+      orderForm.quantity.value = qtyInput.value;
+    });
+
+    function closeOrderModal() {
+      orderModal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    closeOrderModalBtn.addEventListener('click', closeOrderModal);
+    orderModal.addEventListener('click', (e) => { if (e.target === orderModal) closeOrderModal(); });
+
+    // WhatsApp nga formulari i porosisë
+    orderWA.addEventListener('click', () => {
+      const data = Object.fromEntries(new FormData(orderForm).entries());
+      const text = `Përshëndetje! Dua të bëj porosi:\n`+
+        `Emri: ${data.full_name}\n`+
+        `Tel: ${data.phone}\n`+
+        `Qyteti: ${data.city}\n`+
+        `Adresa: ${data.address}\n`+
+        `Produkt: ${data.product}\n`+
+        `Detaje: ${data.variant}\n`+
+        `Sasia: ${data.quantity}\n`+
+        `Shënime: ${data.note || '-'}\n`;
+      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    });
+  </script>
+
+  <!--
+  =========================
+  UDHËZIME SHKURT NË VSCODE
+  =========================
+  1) Hap VS Code → File → New File → ruaje si "index.html" dhe ngjite këtë kod.
+  2) Në VS Code, kliko me të djathtën te skedari dhe zgjidh "Open with Live Server" (ose thjesht hap skedarin me dy klikime).
+  3) Ndrysho logon DYQANI IM, produktet, çmimet dhe fotot (zëvendëso URL-t e picsum.photos me fotot e tua).
+  4) Vendos numrin tënd te WHATSAPP_NUMBER (p.sh. 35569xxxxxxx) që të funksionojë butoni WhatsApp.
+  5) (Opsionale) Aktivizo EmailJS:
+     - Krijo llogari në https://www.emailjs.com/
+     - Shto një Email Service dhe Template.
+     - Kopjo PUBLIC KEY, SERVICE ID, TEMPLATE ID te variablat sipër.
+     - Hiq komentin te rreshti i SDK: <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+     - Në template përdor fushat: full_name, phone, city, address, product, variant, quantity, note, message.
+  6) Publikim falas: krijo llogari në Netlify ose GitHub Pages dhe ngarko skedarin index.html.
+  -->
+</body>
+</html>
